@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarRent Pro - CRM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff9500 0%, #ff7b00 100%);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255,255,255,0.3);
+            border-left: 4px solid white;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #ff9500;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9500, #ff7b00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-icon {
+            font-size: 24px;
+            color: #ff9500;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-subtext {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .card.success {
+            border-left: 5px solid #4CAF50;
+        }
+
+        .card.warning {
+            border-left: 5px solid #FFC107;
+        }
+
+        .card.info {
+            border-left: 5px solid #2196F3;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #ff9500 0%, #ff7b00 100%);
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .status-badge.pending {
+            background-color: #fff9c4;
+            color: #f57f17;
+        }
+
+        .status-badge.completed {
+            background-color: #b3e5fc;
+            color: #0277bd;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff9500, #ff7b00);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 149, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .chart-label {
+            width: 120px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .chart-progress {
+            flex: 1;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .chart-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9500, #ff7b00);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #ff9500;
+            box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 15px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            🚗 CarRent Pro
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-item active">
+                📊 Dashboard
+            </div>
+            <div class="nav-item">
+                📅 Reservas
+            </div>
+            <div class="nav-item">
+                👥 Clientes
+            </div>
+            <div class="nav-item">
+                🚙 Frota
+            </div>
+            <div class="nav-item">
+                💳 Pagamentos
+            </div>
+            <div class="nav-item">
+                📈 Relatórios
+            </div>
+            <div class="nav-item">
+                ⚙️ Configurações
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="user-info">
+                <span>João Silva</span>
+                <div class="avatar">JS</div>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="dashboard-grid">
+            <div class="card success">
+                <div class="card-header">
+                    <div class="card-title">Reservas Ativas</div>
+                    <div class="card-icon">📅</div>
+                </div>
+                <div class="card-value">24</div>
+                <div class="card-subtext">+3 novas esta semana</div>
+            </div>
+
+            <div class="card warning">
+                <div class="card-header">
+                    <div class="card-title">Veículos Disponíveis</div>
+                    <div class="card-icon">🚙</div>
+                </div>
+                <div class="card-value">42</div>
+                <div class="card-subtext">16 em manutenção</div>
+            </div>
+
+            <div class="card info">
+                <div class="card-header">
+                    <div class="card-title">Receita Mensal</div>
+                    <div class="card-icon">💰</div>
+                </div>
+                <div class="card-value">€18.5K</div>
+                <div class="card-subtext">+12% vs mês anterior</div>
+            </div>
+
+            <div class="card success">
+                <div class="card-header">
+                    <div class="card-title">Taxa Ocupação</div>
+                    <div class="card-icon">📊</div>
+                </div>
+                <div class="card-value">87%</div>
+                <div class="card-subtext">Excelente desempenho</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="chart-container">
+            <div class="chart-title">Rentabilidade por Categoria de Veículo</div>
+            <div class="chart-bar">
+                <div class="chart-label">Económicos</div>
+                <div class="chart-progress">
+                    <div class="chart-progress-bar" style="width: 85%;">85%</div>
+                </div>
+            </div>
+            <div class="chart-bar">
+                <div class="chart-label">Compactos</div>
+                <div class="chart-progress">
+                    <div class="chart-progress-bar" style="width: 92%;">92%</div>
+                </div>
+            </div>
+            <div class="chart-bar">
+                <div class="chart-label">SUV</div>
+                <div class="chart-progress">
+                    <div class="chart-progress-bar" style="width: 78%;">78%</div>
+                </div>
+            </div>
+            <div class="chart-bar">
+                <div class="chart-label">Premium</div>
+                <div class="chart-progress">
+                    <div class="chart-progress-bar" style="width: 95%;">95%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservas Section -->
+        <div>
+            <h2 class="section-title">Últimas Reservas</h2>
+            <div class="filter-bar">
+                <input type="text" class="filter-input" placeholder="Buscar por cliente...">
+                <input type="date" class="filter-input" style="flex: 0;">
+                <button class="btn btn-primary">Filtrar</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Reserva</th>
+                        <th>Cliente</th>
+                        <th>Veículo</th>
+                        <th>Levantamento</th>
+                        <th>Devolução</th>
+                        <th>Status</th>
+                        <th>Valor</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#RES001</td>
+                        <td>Maria Santos</td>
+                        <td>Toyota Yaris - AA11BB</td>
+                        <td>22/10/2026</td>
+                        <td>25/10/2026</td>
+                        <td><span class="status-badge active">Ativa</span></td>
+                        <td>€189.50</td>
+                        <td><button class="btn btn-secondary">Ver</button></td>
+                    </tr>
+                    <tr>
+                        <td>#RES002</td>
+                        <td>Pedro Costa</td>
+                        <td>Renault Clio - BB22CC</td>
+                        <td>23/10/2026</td>
+                        <td>27/10/2026</td>
+                        <td><span class="status-badge completed">Confirmada</span></td>
+                        <td>€245.00</td>
+                        <td><button class="btn btn-secondary">Ver</button></td>
+                    </tr>
+                    <tr>
+                        <td>#RES003</td>
+                        <td>Ana Silva</td>
+                        <td>Peugeot 308 - CC33DD</td>
+                        <td>24/10/2026</td>
+                        <td>28/10/2026</td>
+                        <td><span class="status-badge pending">Pendente</span></td>
+                        <td>€312.75</td>
+                        <td><button class="btn btn-secondary">Ver</button></td>
+                    </tr>
+                    <tr>
+                        <td>#RES004</td>
+                        <td>Jorge Oliveira</td>
+                        <td>BMW X3 - DD44EE</td>
+                        <td>25/10/2026</td>
+                        <td>29/10/2026</td>
+                        <td><span class="status-badge completed">Confirmada</span></td>
+                        <td>€487.50</td>
+                        <td><button class="btn btn-secondary">Ver</button></td>
+                    </tr>
+                    <tr>
+                        <td>#RES005</td>
+                        <td>Carla Gomes</td>
+                        <td>Volkswagen Golf - EE55FF</td>
+                        <td>26/10/2026</td>
+                        <td>30/10/2026</td>
+                        <td><span class="status-badge active">Ativa</span></td>
+                        <td>€198.00</td>
+                        <td><button class="btn btn-secondary">Ver</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Frota Section -->
+        <div>
+            <h2 class="section-title">Estado da Frota</h2>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Modelo</th>
+                        <th>Categoria</th>
+                        <th>Último Aluguel</th>
+                        <th>Quilometragem</th>
+                        <th>Status</th>
+                        <th>Próxima Manutenção</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AA11BB</td>
+                        <td>Toyota Yaris</td>
+                        <td>Económico</td>
+                        <td>22/10/2026</td>
+                        <td>145.200 km</td>
+                        <td><span class="status-badge active">Disponível</span></td>
+                        <td>05/11/2026</td>
+                    </tr>
+                    <tr>
+                        <td>BB22CC</td>
+                        <td>Renault Clio</td>
+                        <td>Compacto</td>
+                        <td>18/10/2026</td>
+                        <td>98.500 km</td>
+                        <td><span class="status-badge active">Disponível</span></td>
+                        <td>15/11/2026</td>
+                    </tr>
+                    <tr>
+                        <td>CC33DD</td>
+                        <td>Peugeot 308</td>
+                        <td>Compacto</td>
+                        <td>20/10/2026</td>
+                        <td>167.300 km</td>
+                        <td><span class="status-badge pending">Manutenção</span></td>
+                        <td>01/11/2026</td>
+                    </tr>
+                    <tr>
+                        <td>DD44EE</td>
+                        <td>BMW X3</td>
+                        <td>Premium</td>
+                        <td>19/10/2026</td>
+                        <td>82.100 km</td>
+                        <td><span class="status-badge active">Disponível</span></td>
+                        <td>20/11/2026</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
